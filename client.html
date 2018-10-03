@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CAPSTONE12</title>
+<meta name = "viewport" content="width=device-width, initial-scale = 1" />
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+//https://okdevtv.com/kr/socket.io-chat-kr.html
+// 동적 tag: http://roqkffhwk.tistory.com/35
+var owner = 'no user'; //html 로그인 상태를 기억
+var socket = io.connect();
+var serchstr = "";
+
+	$(document).ready(function(){
+
+    alert("client connect!");
+
+    //로그인 후 화면
+  $("#loginButton").click(function(){
+        var name = $("#id").val();
+        var passwd = $("#pwd").val();
+        //데이터 확인을 위해 emmit
+        socket.emit('checkUser',{id:name,pwd:passwd});
+    });
+
+  socket.on('enableUser',function(tf){
+   <!-- tag create-->
+   var name = $("#id").val();
+   if(tf.rst){
+     owner = name;
+     var output ='';
+     output += '<div style="width:90%; margin: 5%; height:100%;">';
+     output += '  <strong style="margin:5%">';
+     output += 'NAME: '
+     output += name;
+     $("#log").html(output);
+     <!-- 글쓰기 버튼 만들기 & 이름 설정-->
+     output = '';
+     output += '<label id="writerUser" style="margin:2%; width:100%;">';
+     output += name;
+     output += '</label>';
+     //html은 해당 태그를 없애도 다시 붙이는 것
+     $("#writerUser").html(output);
+   }
+   else {
+     alert("비밀번호가 틀렸읍니다.");
+     $("#id").val("");
+     $("#pwd").val("");
+   }
+ });
+
+ //summit 후 textarea 비우기
+$("#summitButton").click(function(){
+ var cnt = $("#content").val();
+ var tags = $("#tag").val();
+
+ <!-- 디비 저장 + 소켓 -->
+ if(owner != 'no user')
+  socket.emit('sendPost',{content:cnt,tag:tags,writer:owner});
+  else {
+    alert("로그인 후 이용하십시오.");
+  }
+
+ //textarea 삭제
+ $("#content").val("");
+ $("#tag").val("");
+});
+
+
+ //search후 아래에 관련 post 다 띄우기
+ socket.on('prePost',function(data){
+   var output = '';
+   output +='   <div id="table" style="border:1px solid black;"> <table> <tbody> <tr> <td>';
+   output += data.writer;
+   output += '</td> \
+         <td> <button id = "deleteButton" value=\"';
+  output += data.postNum;
+  output += '\" style="float:right; margin:1.5% 2% 0% 0%;" onclick = "deletePost(';
+  output += data.postNum;
+  output+=",\'";
+  output+=data.writer;
+  output +='\')"> Delete </button> </td>\
+       </tr>\
+       <tr>\
+         <td>Contents: </td>\
+         <td><strong>';
+  output += data.content;
+  output += '</strong> </td>\
+       </tr>\
+       <tr>\
+         <td>Tags: </td>\
+         <td><strong>';
+  output += data.tag;
+
+  output += '</strong> </td>\
+       </tr>\
+       <tr style="border:1px solid black;">\
+         <td>Like: ';
+  output += data.like;
+  output +='</td><td>\
+            <button id = "likeButton" onclick = "likeUp(';
+  output += data.postNum;
+  output += ')" style="float:right; margin:1.5% 2% 0% 0%;"> Like </button>\
+         </td>\
+       </tr>';
+
+  output += '</tbody> </table> </div>';
+  $(output).prependTo('#list');
+  //$("#list").after(output);
+});
+
+
+  $("#searchButton").click(function(){
+    $("#searchArea").empty();
+    serchstr = $("#serch").val();
+    socket.emit('searchTag',{tag:$("#serch").val()});
+    $("#serch").val("");
+    //$("#searchArea").after(output);
+  });
+  socket.on('searchResult',function(data){
+    var output = '';
+    output +='   <div id="table" style="border:1px solid black;"> <table> <tbody> <tr> <td>';
+    output += data.writer;
+    output += '</td> \
+        <tr>\
+          <td>Contents: </td>\
+          <td><strong>';
+   output += data.content;
+   output += '</strong> </td>\
+        </tr>\
+        <tr>\
+          <td>Tags: </td>\
+          <td><strong>';
+   output += data.tag;
+   output += '</strong> </td>\
+        </tr>\
+        <tr style="border:1px solid black;">\
+          <td>Like: ';
+   output += data.like;
+   output +='</td><td>\
+             <button id = "likeButton" onclick = "likeUp2(';
+  output += data.postNum;
+  output += ')" style="float:right; margin:1.5% 2% 0% 0%;"> Like </button>\
+          </td>\
+        </tr>';
+
+   output += '</tbody> </table> </div>';
+  $(output).prependTo('#searchArea');
+
+  });
+
+});
+
+
+function deletePost(s,w){
+  if(owner == w){
+    $("#list").empty();
+    socket.emit('deleteP',s);
+  }
+  else {
+    alert("본인의 게시물만 지울 수 있습니다.");
+  }
+}
+function likeUp(pn){
+  $("#list").empty();
+  socket.emit('upLike',pn);
+}
+function likeUp2(pn){
+  $("#searchArea").empty();
+  $("#list").empty();
+
+  socket.emit('upLike',pn);
+  socket.emit('searchTag',{tag:serchstr });
+}
+
+</script>
+</head>
+
+<body>
+  <!-- title -->
+  <div style="width:100%;margin:50px">
+		<h1 style="background-color:white">Capstone 12</h1>
+  </div>
+
+  <!-- login -->
+  <div id= 'section1' style="float:left; width:16%; margin:0% 0% 0% 3%">
+    <h4 style="margin:5%" id="test">  로★그★인 </h4>
+    <div id="log"style="width:90%; margin: 5%; height:100%; border:1px solid black;">
+      <p>
+        <strong style="margin:5%"> 아이디</strong>
+        <input type='text' id="id" style="margin:5%; width:80%;">
+      </p>
+        <p>
+          <strong style="margin:5%"> 비밀번호</strong>
+          <input type='password' id='pwd' style="margin:5%; width:80%;">
+        </p>
+    <label id="loginError" style="width:70%; margin: 0% 0%  10% 5%; font-size:90%"> </label>
+
+    <button id = "loginButton" style="float:right; margin: 0% 2% 2% 0%" > Login </button>
+    </div>
+
+  </div>
+  <!-- content -->
+  <div id= 'section2' style="float:left;width:45%;margin:0% 1% 0% 1%">
+    <h4 style="margin:5%">  글★쓰★기 </h4>
+        <!-- 글 쓰는 곳-->
+    <div style="margin: 5%; width:90%; height:100%; border:1px solid black;">
+      <div id="writerinfo">
+              <label id='writerUser' style="margin:2%; width:100%;">no user</label>
+              <button id = "summitButton" style="float:right; margin:1.5% 2% 0% 0%;"> Summit </button>
+      </div>
+      <strong style="margin:2%;width:100%;"> Content: </strong>
+      <textarea cols="5" id='content' style="margin:2%; width: 94%; height:100%;"></textarea>
+      <strong style="margin:2%"> Tag: </strong>
+      <textarea cols="5" id='tag' style="margin:2%; width: 94%; height:100%;"> </textarea>
+
+    </div>
+
+    <!-- 등록 된 글 출력-->
+    <div>
+      <div id="postArea" style="margin:5%">
+        <div id="list">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- retirival -->
+  <div id= 'section3' style="float:left;width:30%;margin:0% 3% 0% 0%;">
+    <h4 style="margin:5%">  ★검★색★ </h4>
+      <div style="margin:5%;width:100%;height:100%;border:1px solid black">
+        <button id = "searchButton" style="float:right; margin:1.5% 2% 0% 0%; "> Search </button>
+        <input id='serch' type='text' style="margin:2%; width: 94%; height:100%;"> </input>
+      </div>
+      <div id="searchArea">
+      </div>
+  </div>
+</body>
+</html>
