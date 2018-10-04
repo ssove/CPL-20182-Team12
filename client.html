@@ -4,10 +4,33 @@
 <meta charset="utf-8">
 <title>CAPSTONE12</title>
 <meta name = "viewport" content="width=device-width, initial-scale = 1" />
-<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+
+<style type="text/css">
+	table.type06 {
+	    border-collapse: collapse;
+	    text-align: left;
+	    line-height: 1.5;
+	    border-top: 1px solid #ccc;
+	    border-bottom: 1px solid #ccc;
+	    margin: 20px 10px;
+	}
+	table.type06 th {
+	    width: 150px;
+	    padding: 10px;
+	    font-weight: bold;
+	    vertical-align: top;
+	}
+	table.type06 td {
+	    width: 350px;
+	    padding: 10px;
+	    vertical-align: top;
+	}
+	table.type06 .even {
+	    background: #efefef;
+	}
+</style>
 
 <script>
 //https://okdevtv.com/kr/socket.io-chat-kr.html
@@ -18,7 +41,7 @@ var serchstr = "";
 
 	$(document).ready(function(){
 
-    alert("client connect!");
+  //  alert("client connect!");
 
     //로그인 후 화면
   $("#loginButton").click(function(){
@@ -34,10 +57,12 @@ var serchstr = "";
    if(tf.rst){
      owner = name;
      var output ='';
-     output += '<div style="width:90%; margin: 5%; height:100%;">';
-     output += '  <strong style="margin:5%">';
-     output += 'NAME: '
-     output += name;
+		output+=' <table class="type06" id = "log" style="width:100%"><tbody><tr><th>';
+		output += '  <strong style="margin:5%">';
+		output += 'NAME: '
+		output += name;
+		output+='</th></tr></tbody></table></div>';
+
      $("#log").html(output);
      <!-- 글쓰기 버튼 만들기 & 이름 설정-->
      output = '';
@@ -75,9 +100,9 @@ $("#summitButton").click(function(){
  //search후 아래에 관련 post 다 띄우기
  socket.on('prePost',function(data){
    var output = '';
-   output +='   <div id="table" style="border:1px solid black;"> <table> <tbody> <tr> <td>';
+   output +='   <div id="table" style="border:1px solid black;"> <table class="type06"> <tbody> <tr> <th>';
    output += data.writer;
-   output += '</td> \
+   output += '</th> \
          <td> <button id = "deleteButton" value=\"';
   output += data.postNum;
   output += '\" style="float:right; margin:1.5% 2% 0% 0%;" onclick = "deletePost(';
@@ -86,20 +111,20 @@ $("#summitButton").click(function(){
   output+=data.writer;
   output +='\')"> Delete </button> </td>\
        </tr>\
-       <tr>\
+       <tr  class="even">\
          <td>Contents: </td>\
          <td><strong>';
   output += data.content;
   output += '</strong> </td>\
        </tr>\
-       <tr>\
+       <tr >\
          <td>Tags: </td>\
          <td><strong>';
   output += data.tag;
 
   output += '</strong> </td>\
        </tr>\
-       <tr style="border:1px solid black;">\
+       <tr class="even">\
          <td>Like: ';
   output += data.like;
   output +='</td><td>\
@@ -122,12 +147,13 @@ $("#summitButton").click(function(){
     $("#serch").val("");
     //$("#searchArea").after(output);
   });
+
   socket.on('searchResult',function(data){
     var output = '';
-    output +='   <div id="table" style="border:1px solid black;"> <table> <tbody> <tr> <td>';
+    output +='   <div id="table" style="border:1px solid black;"> <table class="type06"> <tbody> <tr> <td>';
     output += data.writer;
     output += '</td> \
-        <tr>\
+        <tr class="even">\
           <td>Contents: </td>\
           <td><strong>';
    output += data.content;
@@ -139,7 +165,7 @@ $("#summitButton").click(function(){
    output += data.tag;
    output += '</strong> </td>\
         </tr>\
-        <tr style="border:1px solid black;">\
+        <tr class="even"">\
           <td>Like: ';
    output += data.like;
    output +='</td><td>\
@@ -148,11 +174,10 @@ $("#summitButton").click(function(){
   output += ')" style="float:right; margin:1.5% 2% 0% 0%;"> Like </button>\
           </td>\
         </tr>';
-
    output += '</tbody> </table> </div>';
-  $(output).prependTo('#searchArea');
+	  $(output).prependTo('#searchArea');
+  	});
 
-  });
 
 });
 
@@ -166,10 +191,12 @@ function deletePost(s,w){
     alert("본인의 게시물만 지울 수 있습니다.");
   }
 }
+
 function likeUp(pn){
   $("#list").empty();
   socket.emit('upLike',pn);
 }
+
 function likeUp2(pn){
   $("#searchArea").empty();
   $("#list").empty();
@@ -183,41 +210,64 @@ function likeUp2(pn){
 
 <body>
   <!-- title -->
-  <div style="width:100%;margin:50px">
-		<h1 style="background-color:white">Capstone 12</h1>
+  <div style="width:100%;padding:50px 50px 30px 50px;background-color:#707070; ">
+		<h1 style="color:white">Capstone 12</h1>
   </div>
+	<table class="type06" style="width:100%">
+	<tbody>
+		<tr>
+			<th style="text-align:center; width:20%"> User </th>
+			<th style="text-align:center; width:43%" class="even"> Contents </th>
+			<th style="text-align:center; width:37%; margin: 0% 10% 0% 0%"> Retrival </th>
+		</tr>
+	</tbody>
+	</table>
 
   <!-- login -->
-  <div id= 'section1' style="float:left; width:16%; margin:0% 0% 0% 3%">
-    <h4 style="margin:5%" id="test">  로★그★인 </h4>
-    <div id="log"style="width:90%; margin: 5%; height:100%; border:1px solid black;">
-      <p>
-        <strong style="margin:5%"> 아이디</strong>
-        <input type='text' id="id" style="margin:5%; width:80%;">
-      </p>
-        <p>
-          <strong style="margin:5%"> 비밀번호</strong>
-          <input type='password' id='pwd' style="margin:5%; width:80%;">
-        </p>
-    <label id="loginError" style="width:70%; margin: 0% 0%  10% 5%; font-size:90%"> </label>
-
-    <button id = "loginButton" style="float:right; margin: 0% 2% 2% 0%" > Login </button>
-    </div>
-
+  <div id= 'section1' style="float:left; width:16%; margin:1% 0% 0% 3%; border:1px solid black;">
+		<table class="type06" id = "log">
+			<tbody>
+				<tr>
+					<td>
+						<strong style="margin:5%"> ID</strong>
+		        <input type='text' id="id" style="margin:5%; width:80%;">
+	          <strong style="margin:5%"> 비밀번호</strong>
+	          <input type='password' id='pwd' style="margin:5%; width:80%;">
+						<label id="loginError" style="width:70%; margin: 0% 0%  10% 5%; font-size:90%"> </label>
+						<button id = "loginButton" style="float:right; margin: 0% 2% 2% 0%" > Login </button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
   </div>
   <!-- content -->
-  <div id= 'section2' style="float:left;width:45%;margin:0% 1% 0% 1%">
-    <h4 style="margin:5%">  글★쓰★기 </h4>
+  <div id= 'section2' style="float:left;width:45%;margin:0.5% 1% 0% 1%">
         <!-- 글 쓰는 곳-->
-    <div style="margin: 5%; width:90%; height:100%; border:1px solid black;">
-      <div id="writerinfo">
-              <label id='writerUser' style="margin:2%; width:100%;">no user</label>
-              <button id = "summitButton" style="float:right; margin:1.5% 2% 0% 0%;"> Summit </button>
-      </div>
-      <strong style="margin:2%;width:100%;"> Content: </strong>
-      <textarea cols="5" id='content' style="margin:2%; width: 94%; height:100%;"></textarea>
-      <strong style="margin:2%"> Tag: </strong>
-      <textarea cols="5" id='tag' style="margin:2%; width: 94%; height:100%;"> </textarea>
+    <div style="margin: 1% 5% 5% 5%; width:90%; height:100%; border:1px solid black;">
+		<table class="type06" style="margin:5% 5% 5% 10%">
+			<tbody style="width:100%; float:center;">
+				<tr>
+					<th id="writerinfo">
+						<label id='writerUser' style="margin:2%; width:100%;">no user</label>
+						<button id = "summitButton" style="float:right; margin:1.5% 2% 0% 0%;"> Summit </button>
+					</th>
+				</tr>
+					<tr>
+						<td>
+							<strong style="margin:2%;width:100%;"> Content: </strong>
+			      	<textarea cols="5" id='content' style="margin:2%; width: 94%; height:100%;"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<strong style="margin:2%"> Tag: </strong>
+			      	<textarea cols="5" id='tag' style="margin:2%; width: 94%; height:100%;"> </textarea>
+						</td>
+					</tr>
+			</tbody>
+		</table>
+
+
 
     </div>
 
@@ -232,14 +282,13 @@ function likeUp2(pn){
   </div>
 
   <!-- retirival -->
-  <div id= 'section3' style="float:left;width:30%;margin:0% 3% 0% 0%;">
-    <h4 style="margin:5%">  ★검★색★ </h4>
-      <div style="margin:5%;width:100%;height:100%;border:1px solid black">
-        <button id = "searchButton" style="float:right; margin:1.5% 2% 0% 0%; "> Search </button>
-        <input id='serch' type='text' style="margin:2%; width: 94%; height:100%;"> </input>
-      </div>
-      <div id="searchArea">
-      </div>
+  <div id= 'section3' style="float:left;width:30%;margin:1% 3% 0% 0%;">
+		<div style="border:1px solid black">
+				<button id = "searchButton" style="float:right; margin:1.5% 2% 0% 0%;"> Search </button>
+				<input id='serch' type='text' style="margin:3% 2% 3% 2%; width: 94%; height:100%;"> </input>
+		</div>
+    <div id="searchArea">
+    </div>
   </div>
 </body>
 </html>
