@@ -9,7 +9,7 @@ var socketio = require('socket.io');
 
 // mongodb 연결
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/capstone123',{ useNewUrlParser: true });
+mongoose.connect('mongodb://localhost:27017',{ useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -55,8 +55,8 @@ app.use('/', function(req,res,next){
 
 // creates server
 var server = http.createServer(app);
-server.listen(1337, function(){
-	console.log('server listen on port 1337');
+server.listen(8080, function(){
+	console.log('server listen on port 8080');
 });
 
 // creates WebSocket Server
@@ -213,13 +213,13 @@ io.sockets.on('connection', function(socket) {
 
 		//like up
 		socket.on('upLike',function (data) {
-	//like++
-	PostModel.findOne({postNum:data}).exec(function(err,result){
-		console.log(result);
-		var plus = result.like+1;
-		console.log(plus);
-		PostModel.update({postNum:data},{$set:{like:plus}},function(err,docs){
-				if(err) throw err;
+	     //like++
+	      PostModel.findOne({postNum:data}).exec(function(err,result){
+		        console.log(result);
+		          var plus = result.like+1;
+		            console.log(plus);
+		              PostModel.update({postNum:data},{$set:{like:plus}},function(err,docs){
+				                if(err) throw err;
 		});
 		//귀찮으니 새로 prepost
 		PostModel.find(function(err,result){
