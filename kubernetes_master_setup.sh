@@ -1,4 +1,5 @@
 #!/bin/sh
+# This script must work with the normal user.
 
 kubeadm init > kubernetes_join_token.txt
 
