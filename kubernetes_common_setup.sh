@@ -15,7 +15,8 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 
 apt-get update
-apt-get install -y kubelet kubeadm kubectl
+apt-get install -y kubernetes-cni=0.6.0-00
+apt-get install -y kubelet=1.12.1-02 kubeadm=1.12.1-02 kubectl=1.12.1-02
 
 systemctl daemon-reload
 systemctl restart kubelet
