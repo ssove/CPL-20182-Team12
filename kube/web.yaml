@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-test
+  labels:
+    app: web
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: web-test
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web-deployment-test
+  labels:
+    app: web
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web-test
+    spec:
+      containers:
+        - image: tsi04099/capstone1
+          imagePullPolicy: Always
+          name: map-api
+          ports:
+            - containerPort: 8080
