@@ -9,10 +9,16 @@ var socketio = require('socket.io');
 
 // mongodb 연결
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017',{ useNewUrlParser: true });
+var conndb=0;
+var mongo_host = (process.env.MONGO_SERVICE_HOST || 'localhost');
+var mongo_port = (process.env.MONGO_SERVICE_PORT || 27017);
+var url = 'mongodb://' + mongo_host +':'+ mongo_port + '/capstone12';
+mongoose.connect(url,{useNewUrlParser:true});
+//mongoose.connect('mongodb://localhost:27017/db',{ useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
+	conndb=1;
   	console.log("open: success");
 });
 
@@ -54,8 +60,9 @@ app.use('/', function(req,res,next){
 });
 
 // creates server
+var port = (process.env.PORT || 8080);
 var server = http.createServer(app);
-server.listen(8080, function(){
+server.listen(port, function(){
 	console.log('server listen on port 8080');
 });
 
@@ -73,6 +80,7 @@ var io = socketio.listen(server);
 var endPostNum=0;
 io.sockets.on('connection', function(socket) {
 	console.log("web server connect");
+	socket.emit('conndb',conndb);
 	socket.on('disconnect',function(){
 			console.log('user disconnected');
 		});

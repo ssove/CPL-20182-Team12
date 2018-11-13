@@ -50,6 +50,9 @@ var serchstr = "";
         //데이터 확인을 위해 emmit
         socket.emit('checkUser',{id:name,pwd:passwd});
     });
+  socket.on('conndb',function(str){
+	if(str=='1'){alert("database connect!");}
+	});
 
   socket.on('enableUser',function(tf){
    <!-- tag create-->

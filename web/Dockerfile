@@ -1,9 +1,12 @@
 FROM node:10
 RUN mkdir -p /app
 WORKDIR /app
-COPY package.json ./
+COPY ./server.js .
+COPY ./client.html .
+COPY ./package.json .
 RUN npm install
 COPY . .
-ENV PORT 8080
+EXPOSE 8080
+#ENV PORT 8080
 CMD ["npm","start"]
 
