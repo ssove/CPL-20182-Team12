@@ -23,6 +23,7 @@ metadata:
 spec:
   strategy:
     type: Recreate
+  replicas: 1
   template:
     metadata:
       labels:
@@ -32,5 +33,9 @@ spec:
         - image: tsi04099/capstone1
           imagePullPolicy: Always
           name: map-api
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
           ports:
             - containerPort: 8080

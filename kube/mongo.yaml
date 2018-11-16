@@ -21,6 +21,7 @@ metadata:
 spec:
   strategy:
     type: Recreate
+  replicas: 1
   template:
     metadata:
       labels:
@@ -29,5 +30,9 @@ spec:
       containers:
         - image: mongo
           name: mongodb
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
           ports:
             - containerPort: 27017
