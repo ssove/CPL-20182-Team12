@@ -1,6 +1,8 @@
 #!/bin/sh
 # You should run it as root.
 
+sudo su -
+
 swapoff -a
 
 apt-get update
